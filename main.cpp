@@ -294,3 +294,90 @@ private:
     Node* head;
     Node* tail;
 };
+
+class Keeper {
+public:
+    Keeper() { cout << "Конструктор Keeper без параметров" << endl; }
+    Keeper(const Keeper& other) { cout << "Конструктор Keeper копирования" << endl; }
+    ~Keeper() { cout << "Деструктор Keeper" << endl; }
+
+    void add(Queue* queue) {
+        queues[num_queues++] = queue;
+    }
+
+    void remove(Queue* queue) {
+        for (int i = 0; i < num_queues; ++i) {
+            if (queues[i] == queue) {
+                for (int j = i; j < num_queues - 1; ++j) {
+                    queues[j] = queues[j + 1];
+                }
+                num_queues--;
+                return;
+            }
+        }
+    }
+
+    void save(const string& filename) {
+        ofstream out(filename);
+        if (!out.is_open()) {
+            throw runtime_error("Не удалось открыть файл для записи");
+        }
+        for (int i = 0; i < num_queues; ++i) {
+            out << queues[i]->get() << " ";
+        }
+        out << endl;
+    }
+
+    void load(const string& filename) {
+        ifstream in(filename);
+        if (!in.is_open()) {
+            throw runtime_error("Не удалось открыть файл для чтения");
+        }
+        int value;
+        while (in >> value) {
+            Queue* queue = new Queue();
+            queue->set(value);
+            queues[num_queues++] = queue;
+        }
+    }
+
+private:
+    Queue* queues[100];
+    int num_queues = 0;
+};
+
+
+int main() {
+    Keeper keeper;
+
+    ListQueue* listQueue = new ListQueue();
+    listQueue->push_forward(1);
+    listQueue->push_forward(2);
+    listQueue->push_forward(3);
+    keeper.add(listQueue);
+
+    StackQueue* stackQueue = new StackQueue();
+    stackQueue->push_forward(4);
+    stackQueue->push_forward(5);
+    stackQueue->push_forward(6);
+    keeper.add(stackQueue);
+
+    DequeQueue* dequeQueue = new DequeQueue();
+    dequeQueue->push_forward(7);
+    dequeQueue->push_forward(8);
+    dequeQueue->push_forward(9);
+    keeper.add(dequeQueue);
+
+    keeper.save("queues.txt");
+
+    keeper.remove(listQueue);
+    delete listQueue;
+
+    keeper.load("queues.txt");
+
+    for (auto queue : keeper.queues) {
+        queue->print();
+    }
+
+    return 0;
+}
