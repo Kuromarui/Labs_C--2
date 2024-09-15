@@ -12,6 +12,7 @@ public:
     virtual ~Queue() { cout << "Деструктор Queue" << endl; }
 
     virtual void print() const = 0;
+    virtual void print_in_file(string filename) const = 0;
     virtual void set(int value) = 0;
     virtual int get() const = 0;
     virtual int push_forward(int value) = 0;
@@ -63,6 +64,18 @@ public:
             cout << current->value << " ";
         }
         cout << endl;
+    }
+
+    void print_in_file(string filename) const override {
+        ofstream out(filename);
+        if (!out.is_open()) {
+            throw runtime_error("Не удалось открыть файл для записи");
+        }
+        for (Node* current = head; current; current = current->next) {
+            out << current->value << " ";
+        }
+        out << "/n";
+        out << endl;
     }
 
     void set(int value) override {
@@ -148,6 +161,18 @@ public:
         cout << endl;
     }
 
+    void print_in_file(string filename) const override {
+        ofstream out(filename);
+        if (!out.is_open()) {
+            throw runtime_error("Не удалось открыть файл для записи");
+        }
+        for (Node* current = top; current; current = current->next) {
+            out << current->value << " ";
+        }
+        out << "/n";
+        out << endl;
+    }
+
     void set(int value) override {
         if (top) {
             top->value = value;
@@ -221,6 +246,18 @@ public:
             cout << current->value << " ";
         }
         cout << endl;
+    }
+
+    void print_in_file(string filename) const override {
+        ofstream out(filename);
+        if (!out.is_open()) {
+            throw runtime_error("Не удалось открыть файл для записи");
+        }
+        for (Node* current = head; current; current = current->next) {
+            cout << current->value << " ";
+        }
+        out << "/n";
+        out << endl;
     }
 
     void set(int value) override {
@@ -319,19 +356,16 @@ public:
         }
     }
 
-    void print(Queue* queue){
-        queue->print();
+    void print(){
+        for (int i = 0; i < num_queues; i++){         
+            queues[i]->print();
+        }
     }
 
     void save(const string& filename) {
-        ofstream out(filename);
-        if (!out.is_open()) {
-            throw runtime_error("Не удалось открыть файл для записи");
-        }
         for (int i = 0; i < num_queues; ++i) {
-            out << queues[i]->get() << " ";
+            queues[i]->print_in_file(filename);
         }
-        out << endl;
     }
 
 private:
@@ -349,7 +383,6 @@ int main() {
     listQueue->push_forward(3);
     listQueue->print();
     keeper.add(listQueue);
-    keeper.print(listQueue);
 
     StackQueue* stackQueue = new StackQueue();
     stackQueue->push_forward(4);
@@ -364,11 +397,11 @@ int main() {
     dequeQueue->push_forward(9);
     dequeQueue->print();
     keeper.add(dequeQueue);
+    keeper.print();
 
     keeper.save("queues.txt");
 
     keeper.remove(listQueue);
-    delete listQueue;
 
 
 
