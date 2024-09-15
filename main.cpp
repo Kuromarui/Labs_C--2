@@ -18,6 +18,14 @@ public:
     virtual int push_back(int value) = 0;
     virtual int pop_forward()  = 0;
     virtual int pop_back()  = 0;
+
+protected: 
+    struct Node {
+        int value;
+        Node* next;
+
+        Node(int value) : value(value), next(nullptr) {}
+    };
 };
 
 // Класс Очередь
@@ -95,16 +103,16 @@ public:
         }
         return -1;
     }
+    int push_back(int value) override{
+        return 0;
+    }
+    int pop_back() override{
+        return 0;
+    }
 
 
 
 private:
-    struct Node {
-        int value;
-        Node* next;
-
-        Node(int value) : value(value), next(nullptr) {}
-    };
 
     Node* head;
     Node* tail;
@@ -170,14 +178,14 @@ public:
         }
         return -1;
     }
+    int push_back(int value) override{
+        return 0;
+    }
+    int pop_back() override{
+        return 0;
+    }
 
 private:
-    struct Node {
-        int value;
-        Node* next;
-
-        Node(int value) : value(value), next(nullptr) {}
-    };
 
     Node* top;
 };
@@ -284,12 +292,6 @@ public:
     }
 
 private:
-    struct Node {
-        int value;
-        Node* next;
-
-        Node(int value) : value(value), next(nullptr) {}
-    };
 
     Node* head;
     Node* tail;
@@ -317,6 +319,10 @@ public:
         }
     }
 
+    void print(Queue* queue){
+        queue->print();
+    }
+
     void save(const string& filename) {
         ofstream out(filename);
         if (!out.is_open()) {
@@ -326,19 +332,6 @@ public:
             out << queues[i]->get() << " ";
         }
         out << endl;
-    }
-
-    void load(const string& filename) {
-        ifstream in(filename);
-        if (!in.is_open()) {
-            throw runtime_error("Не удалось открыть файл для чтения");
-        }
-        int value;
-        while (in >> value) {
-            Queue* queue = new Queue();
-            queue->set(value);
-            queues[num_queues++] = queue;
-        }
     }
 
 private:
@@ -354,18 +347,22 @@ int main() {
     listQueue->push_forward(1);
     listQueue->push_forward(2);
     listQueue->push_forward(3);
+    listQueue->print();
     keeper.add(listQueue);
+    keeper.print(listQueue);
 
     StackQueue* stackQueue = new StackQueue();
     stackQueue->push_forward(4);
     stackQueue->push_forward(5);
     stackQueue->push_forward(6);
+    stackQueue->print();
     keeper.add(stackQueue);
 
     DequeQueue* dequeQueue = new DequeQueue();
     dequeQueue->push_forward(7);
     dequeQueue->push_forward(8);
     dequeQueue->push_forward(9);
+    dequeQueue->print();
     keeper.add(dequeQueue);
 
     keeper.save("queues.txt");
@@ -373,11 +370,7 @@ int main() {
     keeper.remove(listQueue);
     delete listQueue;
 
-    keeper.load("queues.txt");
 
-    for (auto queue : keeper.queues) {
-        queue->print();
-    }
 
     return 0;
 }
